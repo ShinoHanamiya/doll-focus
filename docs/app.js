@@ -61,8 +61,8 @@ function update() {
   el.distanceNumber.value = distance.toFixed(1);
   el.focusLabel.textContent = `${distance.toFixed(1)} m`;
   el.sceneSpec.textContent = `${focal}mm  F${aperture.toFixed(1)}  ${orientation === "landscape" ? "横構図" : "縦構図"}  ${focusTarget === "face" ? "顔中心" : "胴体中心"}  ${dollScale.name}`;
-  el.dollMeasure.textContent = `ドール ${dollHeight} cm`;
-  el.frameMeasure.textContent = `画角高さ ${frameHeight.toFixed(0)} cm`;
+  el.dollMeasure.textContent = `${dollHeight} cm`;
+  el.frameMeasure.textContent = `${frameHeight.toFixed(0)} cm`;
   el.angle.textContent = `${angle.toFixed(1)}°`;
   el.near.textContent = `${near.toFixed(2)} m`;
   el.focus.textContent = `${distance.toFixed(2)} m`;
