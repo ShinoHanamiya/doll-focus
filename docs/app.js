@@ -8,6 +8,9 @@ const dollScales = { third: { name: "1/3スケール", height: 60 }, quarter: { 
 const ids = ["sensor", "dollScale", "focal", "aperture", "distance"];
 const el = Object.fromEntries([...ids, "scene", "scale", "angle", "near", "focus", "far", "total", "focalNumber", "apertureNumber", "distanceNumber", "focusLabel", "sceneSpec", "dollMeasure", "frameMeasure", "landscapeButton", "portraitButton", "faceTargetButton", "bodyTargetButton"].map(id => [id, document.getElementById(id)]));
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+const mobileMedia = window.matchMedia("(max-width: 700px)");
+const mobileSubjectX = 62;
+const mobileSubjectFraction = (mobileSubjectX - 9) / 84;
 let orientation = "landscape";
 let focusTarget = "face";
 
@@ -31,7 +34,9 @@ function update() {
   const frameHeight = (distanceMm - focal) * sensorVertical / focal / 10;
   // Keep the true physical ratio. The scene crops lines that extend outside it.
   const framePx = dollPx * (frameHeight / dollHeight);
-  const scaleMax = Math.max(6, Number.isFinite(far) ? far * 1.15 : 8);
+  const scaleMax = mobileMedia.matches
+    ? distance / mobileSubjectFraction
+    : Math.max(6, Number.isFinite(far) ? far * 1.15 : 8);
   const toX = meters => 9 + clamp(meters / scaleMax, 0, 1) * 84;
   const subjectX = toX(distance);
   const coneSubject = (subjectX - 9) / 87 * 100;
@@ -68,6 +73,7 @@ function update() {
 }
 
 ids.forEach(id => el[id].addEventListener("input", update));
+mobileMedia.addEventListener("change", update);
 el.landscapeButton.addEventListener("click", () => {
   orientation = "landscape";
   el.landscapeButton.classList.add("active");
