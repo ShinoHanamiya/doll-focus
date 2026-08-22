@@ -11,8 +11,53 @@ const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
 const mobileMedia = window.matchMedia("(max-width: 700px)");
 const mobileSubjectX = 62;
 const mobileSubjectFraction = (mobileSubjectX - 9) / 84;
+const storageKey = "doll-focus-settings-v1";
 let orientation = "landscape";
 let focusTarget = "face";
+
+function syncToggleButtons() {
+  el.landscapeButton.classList.toggle("active", orientation === "landscape");
+  el.portraitButton.classList.toggle("active", orientation === "portrait");
+  el.landscapeButton.setAttribute("aria-pressed", String(orientation === "landscape"));
+  el.portraitButton.setAttribute("aria-pressed", String(orientation === "portrait"));
+  el.faceTargetButton.classList.toggle("active", focusTarget === "face");
+  el.bodyTargetButton.classList.toggle("active", focusTarget === "body");
+  el.faceTargetButton.setAttribute("aria-pressed", String(focusTarget === "face"));
+  el.bodyTargetButton.setAttribute("aria-pressed", String(focusTarget === "body"));
+}
+
+function loadSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+    if (!saved || typeof saved !== "object") return;
+    if (sensors[saved.sensor]) el.sensor.value = saved.sensor;
+    if (dollScales[saved.dollScale]) el.dollScale.value = saved.dollScale;
+    if (saved.orientation === "landscape" || saved.orientation === "portrait") orientation = saved.orientation;
+    if (saved.focusTarget === "face" || saved.focusTarget === "body") focusTarget = saved.focusTarget;
+    [["focal", 16, 300], ["aperture", 1.2, 22], ["distance", .4, 10]].forEach(([id, min, max]) => {
+      const value = Number(saved[id]);
+      if (Number.isFinite(value)) el[id].value = String(clamp(value, min, max));
+    });
+  } catch {
+    // Keep defaults when storage is unavailable or contains invalid data.
+  }
+}
+
+function saveSettings() {
+  try {
+    localStorage.setItem(storageKey, JSON.stringify({
+      sensor: el.sensor.value,
+      dollScale: el.dollScale.value,
+      orientation,
+      focusTarget,
+      focal: Number(el.focal.value),
+      aperture: Number(el.aperture.value),
+      distance: Number(el.distance.value)
+    }));
+  } catch {
+    // The simulator remains usable when browser storage is disabled.
+  }
+}
 
 function update() {
   const sensor = sensors[el.sensor.value];
@@ -70,40 +115,29 @@ function update() {
   el.total.textContent = Number.isFinite(total) ? `${(total * 100).toFixed(1)} cm` : "∞";
   [el.focal, el.aperture, el.distance].forEach(input => input.style.setProperty("--progress", `${(input.value - input.min) / (input.max - input.min) * 100}%`));
   el.scale.replaceChildren(...[0, .25, .5, .75, 1].map(n => { const span = document.createElement("span"); span.style.left = `${9 + n * 84}%`; span.textContent = `${(n * scaleMax).toFixed(1)}m`; return span; }));
+  saveSettings();
 }
 
 ids.forEach(id => el[id].addEventListener("input", update));
 mobileMedia.addEventListener("change", update);
 el.landscapeButton.addEventListener("click", () => {
   orientation = "landscape";
-  el.landscapeButton.classList.add("active");
-  el.portraitButton.classList.remove("active");
-  el.landscapeButton.setAttribute("aria-pressed", "true");
-  el.portraitButton.setAttribute("aria-pressed", "false");
+  syncToggleButtons();
   update();
 });
 el.portraitButton.addEventListener("click", () => {
   orientation = "portrait";
-  el.portraitButton.classList.add("active");
-  el.landscapeButton.classList.remove("active");
-  el.portraitButton.setAttribute("aria-pressed", "true");
-  el.landscapeButton.setAttribute("aria-pressed", "false");
+  syncToggleButtons();
   update();
 });
 el.faceTargetButton.addEventListener("click", () => {
   focusTarget = "face";
-  el.faceTargetButton.classList.add("active");
-  el.bodyTargetButton.classList.remove("active");
-  el.faceTargetButton.setAttribute("aria-pressed", "true");
-  el.bodyTargetButton.setAttribute("aria-pressed", "false");
+  syncToggleButtons();
   update();
 });
 el.bodyTargetButton.addEventListener("click", () => {
   focusTarget = "body";
-  el.bodyTargetButton.classList.add("active");
-  el.faceTargetButton.classList.remove("active");
-  el.bodyTargetButton.setAttribute("aria-pressed", "true");
-  el.faceTargetButton.setAttribute("aria-pressed", "false");
+  syncToggleButtons();
   update();
 });
 [["focal", "focalNumber"], ["aperture", "apertureNumber"], ["distance", "distanceNumber"]].forEach(([rangeId, numberId]) => {
@@ -118,4 +152,6 @@ el.bodyTargetButton.addEventListener("click", () => {
   number.addEventListener("change", commit);
   number.addEventListener("keydown", event => { if (event.key === "Enter") number.blur(); });
 });
+loadSettings();
+syncToggleButtons();
 update();
