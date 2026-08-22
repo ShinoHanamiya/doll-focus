@@ -21,6 +21,7 @@
       <div class="controls">
         <label>センサー<select id="sensor"><option value="full">フルサイズ</option><option value="apsc">APS-C</option><option value="mft">MFT</option></select></label>
         <div class="orientation-control"><span>構図</span><div><button type="button" id="landscapeButton" class="active" aria-pressed="true">横構図</button><button type="button" id="portraitButton" aria-pressed="false">縦構図</button></div></div>
+        <div class="focus-target-control"><span>画角中心</span><div><button type="button" id="faceTargetButton" class="active" aria-pressed="true">顔中心</button><button type="button" id="bodyTargetButton" aria-pressed="false">胴体中心</button></div></div>
         <label>ドールスケール<select id="dollScale"><option value="third">1/3スケール・約60cm</option><option value="quarter" selected>1/4スケール・約45cm</option><option value="sixth">1/6スケール・約27cm</option><option value="twelfth">1/12スケール・約15cm</option><option value="eighty">80cmドール</option><option value="oneThirtyFive">135cmドール</option><option value="oneFortyFive">145cmドール</option><option value="oneFiftyFive">155cmドール</option></select></label>
         <label>焦点距離<strong class="number-box"><input id="focalNumber" aria-label="焦点距離の数値" type="number" min="16" max="300" step="1" value="50"><small>mm</small></strong><input id="focal" aria-label="焦点距離スライダー" type="range" min="16" max="300" step="1" value="50"></label>
         <label>絞り<strong class="number-box"><span>F</span><input id="apertureNumber" aria-label="絞りの数値" type="number" min="1.2" max="22" step="0.1" value="2.8"></strong><input id="aperture" aria-label="絞りスライダー" type="range" min="1.2" max="22" step="0.1" value="2.8"></label>
@@ -46,7 +47,6 @@
         <div class="highlight"><span>被写界深度</span><strong id="total">14.6 cm</strong></div>
       </div>
     </section>
-    <section class="note"><div><span>POINT</span><h2>顔の中心が、いつも画角の中心。</h2></div><p>スケールを変えても光軸は顔の中心を通ります。F値を大きくすると緑のピント帯が広くなり、顔から衣装まで解像させやすくなります。</p></section>
   </main>
   <footer><p>薄レンズ近似による計算値です。実際の写りはレンズ設計や撮影条件で変わります。</p><span>© Doll Focus</span></footer>
 </body>
