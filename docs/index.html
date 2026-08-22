@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Doll Focus — ドール撮影の被写界深度シミュレーター</title>
+  <meta name="description" content="カメラ・レンズ・絞り・撮影距離から、ドール撮影でピントが合う範囲を視覚化します。">
+  <meta property="og:title" content="Doll Focus — ドール撮影の被写界深度シミュレーター">
+  <meta property="og:description" content="絞り・焦点距離・撮影距離から、ピントが合う奥行きを図解。">
+  <meta property="og:image" content="og.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header><a class="brand" href="#top"><span>DF</span>Doll Focus</a><p>Depth of field simulator</p></header>
+  <main>
+    <section class="hero" id="top"><p class="kicker">ドール撮影のピントを、撮る前に。</p><h1>どこから、どこまで<br>ピントが合う？</h1></section>
+    <section class="tool" aria-label="被写界深度シミュレーター">
+      <div class="controls">
+        <label>センサー<select id="sensor"><option value="full">フルサイズ</option><option value="apsc">APS-C</option><option value="mft">MFT</option></select></label>
+        <div class="orientation-control"><span>構図</span><div><button type="button" id="landscapeButton" class="active" aria-pressed="true">横構図</button><button type="button" id="portraitButton" aria-pressed="false">縦構図</button></div></div>
+        <label>ドールスケール<select id="dollScale"><option value="third">1/3スケール・約60cm</option><option value="quarter" selected>1/4スケール・約45cm</option><option value="sixth">1/6スケール・約27cm</option><option value="twelfth">1/12スケール・約15cm</option><option value="eighty">80cmドール</option><option value="oneThirtyFive">135cmドール</option><option value="oneFortyFive">145cmドール</option><option value="oneFiftyFive">155cmドール</option></select></label>
+        <label>焦点距離<strong class="number-box"><input id="focalNumber" aria-label="焦点距離の数値" type="number" min="16" max="300" step="1" value="50"><small>mm</small></strong><input id="focal" aria-label="焦点距離スライダー" type="range" min="16" max="300" step="1" value="50"></label>
+        <label>絞り<strong class="number-box"><span>F</span><input id="apertureNumber" aria-label="絞りの数値" type="number" min="1.2" max="22" step="0.1" value="2.8"></strong><input id="aperture" aria-label="絞りスライダー" type="range" min="1.2" max="22" step="0.1" value="2.8"></label>
+        <label>撮影距離<strong class="number-box"><input id="distanceNumber" aria-label="撮影距離の数値" type="number" min="0.4" max="5" step="0.1" value="1.5"><small>m</small></strong><input id="distance" aria-label="撮影距離スライダー" type="range" min="0.4" max="5" step="0.1" value="1.5"></label>
+      </div>
+      <div class="diagram">
+        <div class="scene" id="scene">
+          <div class="scene-spec" id="sceneSpec">50mm&nbsp;&nbsp;F2.8&nbsp;&nbsp;1/4スケール</div>
+          <div class="angle-cone"></div><div class="dof-zone"><span>IN FOCUS</span></div>
+          <div class="camera" aria-label="カメラ"><div class="camera-body"><i></i></div><div class="lens"><i></i></div><span>CAMERA</span></div>
+          <div class="focus-line"><span id="focusLabel">1.5 m</span></div>
+          <div class="measure doll-measure"><span id="dollMeasure">ドール 45 cm</span></div>
+          <div class="measure frame-measure"><span id="frameMeasure">画角高さ 70 cm</span></div>
+          <div class="doll" aria-label="ドール"><div class="hair"></div><div class="head"></div><div class="neck"></div><div class="body"></div><div class="arms"><i></i><i></i></div><div class="skirt"></div><div class="legs"><i></i><i></i></div><span>DOLL</span></div>
+        </div>
+        <div class="scale" id="scale"></div>
+        <div class="legend"><span><i class="orange"></i>画角 <b id="angle">27.0°</b></span><span><i class="green"></i>ピントが合う範囲</span><span>※シルエットは固定表示／寸法線は実寸比（画面外は切り抜き）</span></div>
+      </div>
+      <div class="results">
+        <div><span>手前側</span><strong id="near">1.43 m</strong></div>
+        <div class="active"><span>ピント位置</span><strong id="focus">1.50 m</strong></div>
+        <div><span>奥側</span><strong id="far">1.58 m</strong></div>
+        <div class="highlight"><span>被写界深度</span><strong id="total">14.6 cm</strong></div>
+      </div>
+    </section>
+    <section class="note"><div><span>POINT</span><h2>顔の中心が、いつも画角の中心。</h2></div><p>スケールを変えても光軸は顔の中心を通ります。F値を大きくすると緑のピント帯が広くなり、顔から衣装まで解像させやすくなります。</p></section>
+  </main>
+  <footer><p>薄レンズ近似による計算値です。実際の写りはレンズ設計や撮影条件で変わります。</p><span>© Doll Focus</span></footer>
+</body>
+</html>
