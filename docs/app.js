@@ -6,9 +6,10 @@ const sensors = {
 const dollScales = { third: { name: "1/3スケール", height: 60 }, quarter: { name: "1/4スケール", height: 45 }, sixth: { name: "1/6スケール", height: 27 }, twelfth: { name: "1/12スケール", height: 15 }, eighty: { name: "80cmドール", height: 80 }, oneThirtyFive: { name: "135cmドール", height: 135 }, oneFortyFive: { name: "145cmドール", height: 145 }, oneFiftyFive: { name: "155cmドール", height: 155 } };
 
 const ids = ["sensor", "dollScale", "focal", "aperture", "distance"];
-const el = Object.fromEntries([...ids, "scene", "scale", "angle", "near", "focus", "far", "total", "focalNumber", "apertureNumber", "distanceNumber", "focusLabel", "sceneSpec", "dollMeasure", "frameMeasure", "landscapeButton", "portraitButton"].map(id => [id, document.getElementById(id)]));
+const el = Object.fromEntries([...ids, "scene", "scale", "angle", "near", "focus", "far", "total", "focalNumber", "apertureNumber", "distanceNumber", "focusLabel", "sceneSpec", "dollMeasure", "frameMeasure", "landscapeButton", "portraitButton", "faceTargetButton", "bodyTargetButton"].map(id => [id, document.getElementById(id)]));
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
 let orientation = "landscape";
+let focusTarget = "face";
 
 function update() {
   const sensor = sensors[el.sensor.value];
@@ -35,6 +36,7 @@ function update() {
   const subjectX = toX(distance);
   const coneSubject = (subjectX - 9) / 87 * 100;
   const coneSubjectRatio = coneSubject / 100;
+  const targetOffset = dollPx * (focusTarget === "face" ? .13 : .4);
   // Extend straight rays from the camera through the subject plane.
   const coneEndHalf = framePx / 2 / coneSubjectRatio;
 
@@ -46,14 +48,14 @@ function update() {
   el.scene.style.setProperty("--cone-end-half", `${coneEndHalf}px`);
   el.scene.style.setProperty("--doll-height", `${dollPx}px`);
   el.scene.style.setProperty("--frame-height", `${framePx}px`);
-  el.scene.style.setProperty("--face-offset", `${dollPx * .13}px`);
+  el.scene.style.setProperty("--target-offset", `${targetOffset}px`);
   el.scene.style.setProperty("--doll-half", `${dollPx * .18}px`);
 
   el.focalNumber.value = focal.toFixed(0);
   el.apertureNumber.value = aperture.toFixed(1);
   el.distanceNumber.value = distance.toFixed(1);
   el.focusLabel.textContent = `${distance.toFixed(1)} m`;
-  el.sceneSpec.textContent = `${focal}mm  F${aperture.toFixed(1)}  ${orientation === "landscape" ? "横構図" : "縦構図"}  ${dollScale.name}`;
+  el.sceneSpec.textContent = `${focal}mm  F${aperture.toFixed(1)}  ${orientation === "landscape" ? "横構図" : "縦構図"}  ${focusTarget === "face" ? "顔中心" : "胴体中心"}  ${dollScale.name}`;
   el.dollMeasure.textContent = `ドール ${dollHeight} cm`;
   el.frameMeasure.textContent = `画角高さ ${frameHeight.toFixed(0)} cm`;
   el.angle.textContent = `${angle.toFixed(1)}°`;
@@ -80,6 +82,22 @@ el.portraitButton.addEventListener("click", () => {
   el.landscapeButton.classList.remove("active");
   el.portraitButton.setAttribute("aria-pressed", "true");
   el.landscapeButton.setAttribute("aria-pressed", "false");
+  update();
+});
+el.faceTargetButton.addEventListener("click", () => {
+  focusTarget = "face";
+  el.faceTargetButton.classList.add("active");
+  el.bodyTargetButton.classList.remove("active");
+  el.faceTargetButton.setAttribute("aria-pressed", "true");
+  el.bodyTargetButton.setAttribute("aria-pressed", "false");
+  update();
+});
+el.bodyTargetButton.addEventListener("click", () => {
+  focusTarget = "body";
+  el.bodyTargetButton.classList.add("active");
+  el.faceTargetButton.classList.remove("active");
+  el.bodyTargetButton.setAttribute("aria-pressed", "true");
+  el.faceTargetButton.setAttribute("aria-pressed", "false");
   update();
 });
 [["focal", "focalNumber"], ["aperture", "apertureNumber"], ["distance", "distanceNumber"]].forEach(([rangeId, numberId]) => {
